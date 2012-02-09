@@ -1,50 +1,46 @@
-require 'rest_client'
-require 'rexml/document'
+require 'active_support/core_ext/hash/conversions'
 
-class Susuwatari
+require 'csv'
+
+module Susuwatari
   class Result
-    include REXML
+    extend Forwardable
+
     STATUS_URL        = 'http://www.webpagetest.org/testStatus.php'
     RESULT_URL_PREFIX = 'http://www.webpagetest.org/xmlResult/'
 
-    attr_reader :test_id, :current_status
-    
-    def initialize( test_run_response )
-      @test_id = Document.new(test_run_response).root.elements['*/testId'].text
+    attr_reader :test_id, :current_status, :test_result, :request_raw
+
+    def_delegators :@test_result, :average, :median
+
+    def initialize( request_response )
+      @request_raw = request_response
+      @test_id  = request_raw.data.testId
     end
-    
+
     def status
-      unless current_status == :complete
-        fetch_status
-      end
+      fetch_status unless current_status == :complete
       current_status
     end
-    
-    private
-        
-    def fetch_status
-      @response = RestClient.get STATUS_URL, :params => { :f => :xml, :test => test_id }
-      case Document.new(@response).root.elements['*/statusCode'].text
-        when /1../
-          @current_status = :running
-        when "200"
-          @current_status = :complete
-          fetch_result
-        else
-          @current_status = :error
-      end
-    end
-    
-    def fetch_result
-      
-    end
-    
-    class Average
-      attr_reader :load_time, :ttfb, :bytes_in, :bytes_in_doc, :requests, :requests_doc, :render, :fullyLoaded, :doc_time, :dom_time, :title_time
-      
-      def initialize( xml_fragment )
-      end
 
+    private
+
+    def fetch_status
+      status = Hashie::Mash.new(JSON.parse( RestClient.get STATUS_URL, :params => { :f => :json, :test => test_id }))
+      case status.data.statusCode.to_s
+      when /1../
+        @current_status = :running
+      when "200"
+        @current_status = :completed
+        fetch_result
+      when /4../
+        @current_status = :error
+      end
+    end
+
+    def fetch_result
+      response = RestClient.get "#{RESULT_URL_PREFIX}/#{test_id}/"
+      @test_result  = Hashie::Mash.new(Hash.from_xml(response.body)).response.data
     end
   end
 end

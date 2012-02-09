@@ -1,7 +1,7 @@
 Susuwatari
 ===
 
-Susuwatari (ススワタリ lit. meaning "travelling soot") is the name of the dust bunnies featured in [Studio Ghibli](http://en.wikipedia.org/wiki/Studio_Ghibli) Animes _My Neighbour Totoro_ and _Spirited Away_. 
+Susuwatari (ススワタリ lit. meaning "travelling soot") is the name of the dust bunnies featured in [Studio Ghibli](http://en.wikipedia.org/wiki/Studio_Ghibli) Animes _My Neighbour Totoro_ and _Spirited Away_.
 
 
 An Introduction for the Impatient (tl;dr)
@@ -10,22 +10,42 @@ An Introduction for the Impatient (tl;dr)
 This gem allows you to use the API of Patrick Meenan excellent [webpagetest.org](http://www.webpagetest.org) and fetch scores, numbers and waterfall images.
 
     require 'susuwatari'
-    mei = Susuwatari.new( url: 'google.com' )
-    mei.run
-    mei.score[:cache_score]
-    => 98
-    mei.data[:number_of_requests]
-    => 12
-    mei.data[:time_to_first_byte]
-    => 0.68
 
+    mei = Susuwatari.new( url: 'google.com', k: '5566sdfdsf' )
+    mei.run
+    => "aASFDasfdads2"
+
+    mei.status
+    => :running
+
+    mei.status
+    => :completed
+
+    mei.result.keys
+     => [ "testId", "summary", "testUrl", "location", "connectivity",
+          "bwDown", "bwUp", "latency", "plr", "completed", "runs", "average",
+          "median", "run"]
+
+    mei.result.testId
+    => "aASFDasfdads2"
+
+    mei.result.run.firstView.images.waterfall
+    => "http://www.webpagetest.org/results/12/02/09/KG/35XV333/1_waterfall.png"
+
+    mei.result.run.firstView.results.score_cache
+    => "98"
+
+    mei.result.run.firstView.results.requests
+    => 12
+
+You can check what a result looks like [here](https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis#TOC-Getting-test-results).
 
 So why Susuwatari?
 ---
 
-Premature optimization might be the root of all evil, but optimizing actual performance bottlenecks is uniquely satisfying. 
+Premature optimization might be the root of all evil, but optimizing actual performance bottlenecks is uniquely satisfying.
 
-Optimizing a web page from the end user perspective is even more satisfying, so we figured we need a way to monitor the web page speed on a regular basis. 
+Optimizing a web page from the end user perspective is even more satisfying, so we figured we need a way to monitor the web page speed on a regular basis.
 
 This gem allows to you test your url using webpagetest.org and get all the relevant numbers (imho) in a structured form. Looking at the waterfall charts allows you to squash all those little nasty dust bunnies that will slow down your page.
 
@@ -33,21 +53,36 @@ This gem allows to you test your url using webpagetest.org and get all the relev
 
 So how to use it?
 ---
-You need an api key from webpagetest.org to use this gem. You can find more information about that on the [Developer Interfaces Documentation](https://sites.google.com/a/webpagetest.org/docs/advanced-features). 
+You need an api key from webpagetest.org to use this gem. You can find more information about that on the [Developer Interfaces Documentation](https://sites.google.com/a/webpagetest.org/docs/advanced-features).
 
 Once you've installed the gem, you can use it like this:
 
     require 'susuwatari'
-    Susuwatari.api_key = 'your-api-key'
 
-    results = Susuwatari.new( url: 'google.com', from: 'detroit', using: 'Chrome' )
-    results.run
+    mei = Susuwatari.new( url: 'google.com', k: 'your-key', from: 'detroit', using: 'Chrome')
+
+    mei.run
+    => 'aBd333'
+
+
+    # You can check the status.
+    mei.status
     => :running
 
-	results.status
-    => :finished
+	mei.status
+    => :completed
 
-    results.keys
-    => [ :cache_score, :first_view_waterfall_url, :load_time, :time_to_first_byte, :dom_elements, …]
+    mei.result.keys
+     => [ "testId", "summary", "testUrl", "location", "connectivity",
+          "bwDown", "bwUp", "latency", "plr", "completed", "runs", "average",
+          "median", "run"]
+
+    #You can access the results as a hash
+    mei.result["testId"]
+    => 'aBd333'
+
+    #Or in a pseudo-object oriented fashion
+    mei.result.testId
+    => 'aBd333'
 
 
