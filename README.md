@@ -85,4 +85,8 @@ Once you've installed the gem, you can use it like this:
     mei.result.testId
     => 'aBd333'
 
+Locations
+----
+To see a list of all the available locations and how you need to pass
+the `location` parameter check [locations](http://www.webpagetest.org/getLocations.php)
 
