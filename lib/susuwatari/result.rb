@@ -1,4 +1,5 @@
 require 'active_support/core_ext/hash/conversions'
+require 'active_support/inflections'
 
 require 'csv'
 
@@ -40,7 +41,25 @@ module Susuwatari
 
     def fetch_result
       response = RestClient.get "#{RESULT_URL_PREFIX}/#{test_id}/"
-      @test_result  = Hashie::Mash.new(Hash.from_xml(response.body)).response.data
+      response = deep_symbolize(Hash.from_xml(response.body)){ |key| key.underscore }
+      @test_result  = Hashie::Mash.new(response).response.data
+    end
+
+    # Thanks to https://gist.github.com/998709 with a slightly modification.
+    def deep_symbolize(hsh, &block)
+      hsh.inject({}) { |result, (key, value)|
+        # Recursively deep-symbolize subhashes
+        value = deep_symbolize(value, &block) if value.is_a? Hash
+
+        # Pre-process the key with a block if it was given
+        key = yield key if block_given?
+        # Symbolize the key string if it responds to to_sym
+        sym_key = key.to_sym rescue key
+
+        # write it back into the result and return the updated hash
+        result[sym_key] = value
+        result
+      }
     end
   end
 end

@@ -22,20 +22,20 @@ This gem allows you to use the API of Patrick Meenan excellent [webpagetest.org]
     => :completed
 
     mei.result.keys
-     => [ "testId", "summary", "testUrl", "location", "connectivity",
-          "bwDown", "bwUp", "latency", "plr", "completed", "runs", "average",
+     => [ "test_id", "summary", "test_url", "location", "connectivity",
+          "bw_down", "bw_up", "latency", "plr", "completed", "runs", "average",
           "median", "run"]
 
-    mei.result.testId
+    mei.result.test_id
     => "aASFDasfdads2"
 
-    mei.result.run.firstView.images.waterfall
+    mei.result.run.first_view.images.waterfall
     => "http://www.webpagetest.org/results/12/02/09/KG/35XV333/1_waterfall.png"
 
-    mei.result.run.firstView.results.score_cache
+    mei.result.run.first_view.results.score_cache
     => "98"
 
-    mei.result.run.firstView.results.requests
+    mei.result.run.first_view.results.requests
     => 12
 
 You can check what a result looks like [here](https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis#TOC-Getting-test-results).
@@ -73,16 +73,16 @@ Once you've installed the gem, you can use it like this:
     => :completed
 
     mei.result.keys
-     => [ "testId", "summary", "testUrl", "location", "connectivity",
-          "bwDown", "bwUp", "latency", "plr", "completed", "runs", "average",
+     => [ "test_id", "summary", "test_url", "location", "connectivity",
+          "bw_down", "bw_up", "latency", "plr", "completed", "runs", "average",
           "median", "run"]
 
     #You can access the results as a hash
-    mei.result["testId"]
+    mei.result[:test_id]
     => 'aBd333'
 
     #Or in a pseudo-object oriented fashion
-    mei.result.testId
+    mei.result.test_id
     => 'aBd333'
 
 Locations
