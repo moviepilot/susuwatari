@@ -69,7 +69,7 @@ Once you've installed the gem, you can use it like this:
     mei.status
     => :running
 
-	mei.status
+    mei.status
     => :completed
 
     mei.result.keys
@@ -84,6 +84,18 @@ Once you've installed the gem, you can use it like this:
     #Or in a pseudo-object oriented fashion
     mei.result.test_id
     => 'aBd333'
+
+Reviewing Previous WPT Runs
+----
+You can retrieve the data for a previous Web Page Test run by passing the
+results page URL into the :url parameter, and calling the `review_results`
+method.
+
+    require 'susuwatari'
+
+    mei = Susuwatari.new( url: 'http://www.webpagetest.org/result/130514_NC_RRZ/', k: '5566sdfdsf' )
+    mei.review_results.run.first_view.results.requests
+    => 1
 
 Locations
 ----

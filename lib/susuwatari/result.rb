@@ -14,9 +14,8 @@ module Susuwatari
 
     def_delegators :@test_result, :average, :median
 
-    def initialize( request_response )
-      @request_raw = request_response
-      @test_id  = request_raw.data.testId
+    def initialize( test_id )
+      @test_id  = test_id
     end
 
     def status
