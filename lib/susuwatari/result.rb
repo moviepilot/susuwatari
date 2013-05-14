@@ -8,7 +8,7 @@ module Susuwatari
     extend Forwardable
 
     STATUS_URL        = 'http://www.webpagetest.org/testStatus.php'
-    RESULT_URL_PREFIX = 'http://www.webpagetest.org/xmlResult/'
+    RESULT_URL_PREFIX = 'http://www.webpagetest.org/jsonResult.php?test='
 
     attr_reader :test_id, :current_status, :test_result, :request_raw
 
@@ -40,26 +40,9 @@ module Susuwatari
     end
 
     def fetch_result
-      response = RestClient.get "#{RESULT_URL_PREFIX}/#{test_id}/"
-      response = deep_symbolize(Hash.from_xml(response.body)){ |key| key.underscore }
-      @test_result  = Hashie::Mash.new(response).response.data
+      response = RestClient.get "#{RESULT_URL_PREFIX}#{test_id}"
+      @test_result  = Hashie::Mash.new(JSON.parse(response)).data
     end
 
-    # Thanks to https://gist.github.com/998709 with a slightly modification.
-    def deep_symbolize(hsh, &block)
-      hsh.inject({}) { |result, (key, value)|
-        # Recursively deep-symbolize subhashes
-        value = deep_symbolize(value, &block) if value.is_a? Hash
-
-        # Pre-process the key with a block if it was given
-        key = yield key if block_given?
-        # Symbolize the key string if it responds to to_sym
-        sym_key = key.to_sym rescue key
-
-        # write it back into the result and return the updated hash
-        result[sym_key] = value
-        result
-      }
-    end
   end
 end
